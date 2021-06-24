@@ -3,6 +3,8 @@ package com.pratiked.capstone;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,9 +18,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.pratiked.capstone.adapter.MoviesAdapter;
+import com.pratiked.capstone.model.Movie;
 import com.pratiked.capstone.util.Constants;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +42,11 @@ public class MoviesFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private RecyclerView rvMovies;
+
     private RequestQueue requestQueue;
+    private List<Movie> movieList;
+    private MoviesAdapter moviesAdapter;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -78,7 +89,15 @@ public class MoviesFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movies, container, false);
 
+        rvMovies = view.findViewById(R.id.rv_movies);
+
         requestQueue = Volley.newRequestQueue(getActivity());
+        movieList = new ArrayList<>();
+
+        moviesAdapter = new MoviesAdapter(movieList);
+        rvMovies.setLayoutManager(new LinearLayoutManager(getActivity(), RecyclerView.VERTICAL, false));
+        rvMovies.setAdapter(moviesAdapter);
+
 
         getMovies();
 
@@ -89,12 +108,20 @@ public class MoviesFragment extends Fragment {
 
     private void getMovies(){
 
-        String url = "https://api.themoviedb.org/3/movie/550?api_key=" + Constants.API_KEY;
+        String popularMovies = "/movie/popular";
+
+        String url = "https://api.themoviedb.org/3" + popularMovies +  "?api_key=" + Constants.API_KEY;
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+
                 Log.d(TAG, "onResponse: " + response);
+
+                //Gson gson = new Gson();
+                //Movie movie = gson.fromJson(response, Movie.class);
+
+               // Log.d(TAG, "onResponse: " + movie.getOriginalTitle());
             }
 
         }, new Response.ErrorListener() {
